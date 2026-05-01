@@ -1,0 +1,27 @@
+rules:
+  - id: python-hardcoded-secret
+    message: Avoid hardcoded secrets in Python code.
+    severity: ERROR
+    languages:
+      - python
+    patterns:
+      - pattern-either:
+          - pattern: $NAME = "$VALUE"
+          - pattern: $NAME = '$VALUE'
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: (?i).*(secret|token|password|apikey|api_key).*
+
+  - id: python-subprocess-shell-true
+    message: Avoid shell=True unless input is fully controlled and justified.
+    severity: WARNING
+    languages:
+      - python
+    pattern: subprocess.$FUNC(..., shell=True, ...)
+
+  - id: dockerfile-latest-tag
+    message: Pin Docker base images instead of using the latest tag.
+    severity: WARNING
+    languages:
+      - dockerfile
+    pattern: FROM $IMAGE:latest

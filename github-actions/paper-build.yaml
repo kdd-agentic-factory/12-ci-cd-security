@@ -1,0 +1,44 @@
+name: Paper Build
+
+on:
+  pull_request:
+    paths:
+      - "paper/**"
+      - "docs/**"
+      - ".github/workflows/paper-build.yaml"
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build academic paper
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Install TeX
+        uses: xu-cheng/latex-action@v3
+        continue-on-error: true
+        with:
+          root_file: paper/main.tex
+
+      - name: Build Markdown paper
+        if: hashFiles('paper/main.md') != ''
+        run: |
+          pandoc paper/main.md -o paper/main.pdf
+
+      - name: Upload artifact
+        if: always() && hashFiles('paper/*.pdf') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper
+          path: paper/*.pdf

@@ -1,0 +1,48 @@
+name: Kubernetes Validate
+
+on:
+  pull_request:
+    paths:
+      - "k8s/**"
+      - "manifests/**"
+      - "charts/**"
+      - ".github/workflows/k8s-validate.yaml"
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Kubernetes manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubeconform
+        run: |
+          curl -sSL -o kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar -xzf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/kubeconform
+
+      - name: Validate manifests
+        run: |
+          found=0
+          for dir in k8s manifests; do
+            if [ -d "$dir" ]; then
+              found=1
+              kubeconform -strict -summary "$dir"
+            fi
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No Kubernetes manifest directories found; skipping."
+          fi
+
+      - name: Validate Helm charts
+        if: hashFiles('charts/**/Chart.yaml') != ''
+        run: |
+          helm lint charts/*

@@ -1,0 +1,23 @@
+severity:
+  - CRITICAL
+  - HIGH
+
+ignore-unfixed: true
+scanners:
+  - vuln
+  - secret
+  - misconfig
+
+vulnerability:
+  type:
+    - os
+    - library
+
+misconfiguration:
+  include-non-failures: false
+  scanners:
+    - terraform
+    - kubernetes
+    - dockerfile
+
+exit-code: 1

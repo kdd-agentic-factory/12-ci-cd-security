@@ -1,0 +1,17 @@
+title = "Organization Gitleaks baseline"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Allow documentation placeholders"
+paths = [
+  '''README\.md''',
+  '''AGENTS\.md''',
+  '''policies/.*\.md''',
+  '''templates/.*\.md''',
+]
+regexes = [
+  '''(?i)example[_-]?(token|secret|password)''',
+  '''(?i)<(token|secret|password)>''',
+]
