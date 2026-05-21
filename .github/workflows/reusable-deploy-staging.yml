@@ -1,0 +1,56 @@
+name: Reusable Deploy Staging
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        required: true
+        type: string
+      image-tag:
+        required: false
+        type: string
+        default: "main"
+      overlay-path:
+        required: false
+        type: string
+        default: "overlays/staging"
+    secrets:
+      kubeconfig:
+        required: false
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubeconfig
+        if: ${{ secrets.kubeconfig != '' }}
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.kubeconfig }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Render manifests
+        run: |
+          kubectl kustomize ${{ inputs.overlay-path }} > rendered-staging.yaml
+
+      - name: Apply manifests
+        run: |
+          kubectl apply -f rendered-staging.yaml
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/${{ inputs.image-name }} --timeout=120s || true
+
+      - name: Upload rendered manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-staging-manifests
+          path: rendered-staging.yaml

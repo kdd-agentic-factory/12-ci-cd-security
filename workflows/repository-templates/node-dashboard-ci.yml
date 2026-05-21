@@ -1,0 +1,23 @@
+name: Node Dashboard CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  node-ci:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-node-ci.yml@main
+    with:
+      node-version: "20"
+      run-build: true
+
+  security:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main
+
+  docker-build:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-docker-build.yml@main
+    with:
+      image-name: ${{ github.event.repository.name }}
+      push: false

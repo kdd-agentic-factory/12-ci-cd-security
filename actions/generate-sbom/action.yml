@@ -1,0 +1,27 @@
+name: Generate SBOM
+description: Generate a Software Bill of Materials using Syft
+
+inputs:
+  image-ref:
+    description: Docker image reference to scan
+    required: true
+  output-file:
+    description: Output file path
+    required: false
+    default: sbom.spdx.json
+
+runs:
+  using: composite
+  steps:
+    - name: Generate SBOM with Syft
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ inputs.image-ref }}
+        format: spdx-json
+        output-file: ${{ inputs.output-file }}
+
+    - name: Upload SBOM artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: ${{ inputs.output-file }}

@@ -1,0 +1,48 @@
+name: Validate KDD Repository
+description: Validate that a repository meets minimum KDD structural requirements
+
+inputs:
+  repo-type:
+    description: Repository type (python-service, node-dashboard, infrastructure, documentation, paper)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Validate README exists
+      shell: bash
+      run: |
+        if [ ! -f README.md ]; then
+          echo "ERROR: README.md is required"
+          exit 1
+        fi
+        echo "[validate] README.md found"
+
+    - name: Validate AGENTS.md exists
+      shell: bash
+      run: |
+        if [ ! -f AGENTS.md ]; then
+          echo "WARNING: AGENTS.md not found — recommended for KDD repos"
+        else
+          echo "[validate] AGENTS.md found"
+        fi
+
+    - name: Validate Python project structure
+      if: ${{ inputs.repo-type == 'python-service' }}
+      shell: bash
+      run: |
+        if [ ! -f pyproject.toml ] && [ ! -f requirements.txt ]; then
+          echo "ERROR: Python service requires pyproject.toml or requirements.txt"
+          exit 1
+        fi
+        echo "[validate] Python project structure valid"
+
+    - name: Validate infrastructure structure
+      if: ${{ inputs.repo-type == 'infrastructure' }}
+      shell: bash
+      run: |
+        if [ ! -f docker-compose.yml ] && [ ! -d overlays ]; then
+          echo "WARNING: No docker-compose.yml or overlays/ directory found"
+        else
+          echo "[validate] Infrastructure structure valid"
+        fi

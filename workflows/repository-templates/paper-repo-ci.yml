@@ -1,0 +1,36 @@
+name: Paper Repository CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  security:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main
+
+  docs-validate:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-docs-validate.yml@main
+    with:
+      docs-path: .
+      check-links: false
+
+  latex-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build LaTeX paper
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: paper.tex
+        continue-on-error: true
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper-pdf
+          path: "*.pdf"
+          if-no-files-found: ignore

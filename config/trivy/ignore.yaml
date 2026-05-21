@@ -1,0 +1,11 @@
+# Trivy vulnerability ignore list
+# Format: CVE-ID or package@version
+# Add entries with justification comment
+
+vulnerabilities:
+  # Example (remove before production use):
+  # - id: CVE-2021-XXXXX
+  #   paths:
+  #     - "**/*.py"
+  #   statement: "Not exploitable in our context — no user input reaches this code path"
+  #   expiry: "2025-12-31"

@@ -1,0 +1,10 @@
+environment: local
+
+checks:
+  - name: ci
+    description: Basic CI checks must pass
+    blocking: true
+
+  - name: security
+    description: No secrets in codebase
+    blocking: true

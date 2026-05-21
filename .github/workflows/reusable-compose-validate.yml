@@ -1,0 +1,21 @@
+name: Reusable Docker Compose Validate
+
+on:
+  workflow_call:
+    inputs:
+      compose-file:
+        required: false
+        type: string
+        default: "docker-compose.yml"
+
+jobs:
+  compose-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose
+        run: |
+          docker compose -f ${{ inputs.compose-file }} config

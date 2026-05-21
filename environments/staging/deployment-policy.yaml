@@ -1,0 +1,19 @@
+environment: staging
+
+promotion:
+  automatic: true
+  source_branch: main
+
+required_checks:
+  - python-ci
+  - security
+  - docker-build
+  - smoke-tests
+
+deployment:
+  target: kdd-staging
+  strategy: rolling
+  rollback_enabled: true
+
+approval:
+  required: false

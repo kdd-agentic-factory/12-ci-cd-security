@@ -1,0 +1,17 @@
+name: Documentation CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs-validate:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-docs-validate.yml@main
+    with:
+      docs-path: docs
+      check-links: false
+
+  security:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main

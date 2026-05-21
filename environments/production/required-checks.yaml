@@ -1,0 +1,30 @@
+environment: production
+
+checks:
+  - name: python-ci
+    description: Python lint, type check and tests
+    blocking: true
+
+  - name: security
+    description: Secret scan and dependency scan — no unfixed CRITICAL/HIGH
+    blocking: true
+
+  - name: docker-build
+    description: Docker image builds and is pushed to GHCR
+    blocking: true
+
+  - name: sbom
+    description: SBOM generated and archived
+    blocking: true
+
+  - name: smoke-tests
+    description: Smoke tests pass after staging deployment
+    blocking: true
+
+  - name: deployment-plan
+    description: Deployment plan reviewed and approved
+    blocking: true
+
+  - name: rollback-plan
+    description: Rollback plan documented and ready
+    blocking: true

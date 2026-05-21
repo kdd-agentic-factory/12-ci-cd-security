@@ -1,0 +1,40 @@
+name: Reusable Kubernetes Validate
+
+on:
+  workflow_call:
+    inputs:
+      overlay-path:
+        required: false
+        type: string
+        default: "overlays/local"
+
+jobs:
+  validate-kubernetes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubeconform
+        run: |
+          curl -L -o kubeconform.tar.gz https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform.tar.gz
+          sudo mv kubeconform /usr/local/bin/kubeconform
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Render Kustomize
+        run: |
+          kubectl kustomize ${{ inputs.overlay-path }} > rendered.yaml
+
+      - name: Validate manifests
+        run: |
+          kubeconform -summary -strict -ignore-missing-schemas rendered.yaml
+
+      - name: Upload rendered manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-manifests
+          path: rendered.yaml

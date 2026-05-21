@@ -1,0 +1,53 @@
+name: Reusable Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      scan-container:
+        required: false
+        type: boolean
+        default: false
+      image-ref:
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  dependency-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+  container-scan:
+    if: ${{ inputs.scan-container }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          image-ref: ${{ inputs.image-ref }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true

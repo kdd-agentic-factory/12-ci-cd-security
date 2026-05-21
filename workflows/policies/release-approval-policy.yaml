@@ -1,0 +1,26 @@
+release_environments:
+  local:
+    manual_approval_required: false
+    required_checks:
+      - ci
+      - security
+
+  staging:
+    manual_approval_required: false
+    required_checks:
+      - ci
+      - security
+      - docker-build
+      - smoke-tests
+
+  production:
+    manual_approval_required: true
+    approver_role: platform_owner
+    required_checks:
+      - ci
+      - security
+      - docker-build
+      - sbom
+      - smoke-tests
+      - deployment-plan
+      - rollback-plan

@@ -1,0 +1,29 @@
+repository_types:
+  python-service:
+    required_checks:
+      - python-ci
+      - security
+      - docker-build
+
+  node-dashboard:
+    required_checks:
+      - node-ci
+      - security
+      - docker-build
+
+  infrastructure:
+    required_checks:
+      - security
+      - kubernetes
+      - compose
+
+  documentation:
+    required_checks:
+      - docs-validate
+      - security
+
+  paper:
+    required_checks:
+      - latex-build
+      - paper-artifacts
+      - security

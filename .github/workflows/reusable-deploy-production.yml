@@ -1,0 +1,54 @@
+name: Reusable Deploy Production
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        required: true
+        type: string
+      image-tag:
+        required: true
+        type: string
+      overlay-path:
+        required: false
+        type: string
+        default: "overlays/production"
+    secrets:
+      kubeconfig:
+        required: true
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.kubeconfig }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Render manifests
+        run: |
+          kubectl kustomize ${{ inputs.overlay-path }} > rendered-production.yaml
+
+      - name: Apply manifests
+        run: |
+          kubectl apply -f rendered-production.yaml
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/${{ inputs.image-name }} --timeout=300s
+
+      - name: Upload rendered manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-production-manifests
+          path: rendered-production.yaml

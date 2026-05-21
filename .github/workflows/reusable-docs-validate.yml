@@ -1,0 +1,40 @@
+name: Reusable Docs Validate
+
+on:
+  workflow_call:
+    inputs:
+      docs-path:
+        required: false
+        type: string
+        default: "."
+      check-links:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: "**/*.md"
+
+  link-check:
+    if: ${{ inputs.check-links }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress ${{ inputs.docs-path }}/**/*.md
+          fail: false

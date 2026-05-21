@@ -1,0 +1,28 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api_key|apikey|api-key)\s*=\s*['\"][0-9a-zA-Z]{20,}['\"]'''
+tags = ["key", "API"]
+
+[[rules]]
+id = "kdd-internal-token"
+description = "KDD internal token pattern"
+regex = '''kdd_[0-9a-zA-Z]{32,}'''
+tags = ["token", "kdd"]
+
+[allowlist]
+description = "Global allowlist"
+regexes = [
+  '''example_token''',
+  '''placeholder''',
+  '''REPLACE_ME''',
+  '''YOUR_TOKEN_HERE''',
+]
+paths = [
+  '''.env.example''',
+  '''docs/''',
+  '''examples/''',
+]

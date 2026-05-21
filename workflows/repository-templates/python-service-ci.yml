@@ -1,0 +1,23 @@
+name: Python Service CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  python-ci:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-python-ci.yml@main
+    with:
+      python-version: "3.11"
+      run-mypy: false
+
+  security:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main
+
+  docker-build:
+    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-docker-build.yml@main
+    with:
+      image-name: ${{ github.event.repository.name }}
+      push: false

@@ -1,0 +1,39 @@
+gates:
+  pre_deploy:
+    - name: ci_passed
+      description: All CI checks must be green
+      blocking: true
+
+    - name: security_scan_passed
+      description: No CRITICAL or HIGH vulnerabilities unfixed
+      blocking: true
+
+    - name: sbom_generated
+      description: SBOM artifact must exist
+      blocking: false
+      environments:
+        - production
+
+    - name: release_notes_written
+      description: RELEASE_NOTES.md must be present
+      blocking: false
+      environments:
+        - staging
+        - production
+
+  post_deploy:
+    - name: health_check
+      description: /health endpoint responds 200 within 60 seconds
+      blocking: true
+
+    - name: smoke_tests_passed
+      description: Smoke test suite must pass
+      blocking: true
+      environments:
+        - staging
+        - production
+
+  rollback_triggers:
+    - health_check_failed
+    - smoke_tests_failed
+    - error_rate_above_threshold

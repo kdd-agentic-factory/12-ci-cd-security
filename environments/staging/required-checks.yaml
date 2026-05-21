@@ -1,0 +1,18 @@
+environment: staging
+
+checks:
+  - name: python-ci
+    description: Python lint, type check and tests
+    blocking: true
+
+  - name: security
+    description: Secret scan and dependency scan
+    blocking: true
+
+  - name: docker-build
+    description: Docker image builds successfully
+    blocking: true
+
+  - name: smoke-tests
+    description: Smoke tests pass after deployment
+    blocking: true

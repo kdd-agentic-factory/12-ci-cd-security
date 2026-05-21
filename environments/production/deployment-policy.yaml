@@ -1,0 +1,23 @@
+environment: production
+
+promotion:
+  automatic: false
+  source_branch: release/*
+
+required_checks:
+  - python-ci
+  - security
+  - docker-build
+  - sbom
+  - smoke-tests
+  - deployment-plan
+  - rollback-plan
+
+deployment:
+  target: kdd-production
+  strategy: rolling
+  rollback_enabled: true
+
+approval:
+  required: true
+  approver_role: platform_owner

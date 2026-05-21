@@ -1,0 +1,69 @@
+name: Reusable Release
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        required: true
+        type: string
+      release-type:
+        required: false
+        type: string
+        default: "auto"
+    secrets:
+      registry-token:
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate version
+        id: version
+        run: |
+          VERSION=$(bash scripts/generate-version.sh)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        run: |
+          bash scripts/generate-release-notes.sh "${{ steps.version.outputs.version }}" > RELEASE_NOTES.md
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.registry-token || github.token }}
+
+      - name: Build and push release image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/kdd-agentic-race-engineering/${{ inputs.image-name }}:${{ steps.version.outputs.version }}
+            ghcr.io/kdd-agentic-race-engineering/${{ inputs.image-name }}:latest
+
+      - name: Generate SBOM
+        run: |
+          bash scripts/generate-sbom.sh ghcr.io/kdd-agentic-race-engineering/${{ inputs.image-name }}:${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            sbom.spdx.json

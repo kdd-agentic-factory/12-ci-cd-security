@@ -1,0 +1,33 @@
+name: Docker Metadata
+description: Generate Docker image tags and labels
+
+inputs:
+  image-name:
+    description: Full image name (e.g. ghcr.io/org/service)
+    required: true
+
+outputs:
+  tags:
+    description: Generated image tags
+    value: ${{ steps.meta.outputs.tags }}
+  labels:
+    description: Generated image labels
+    value: ${{ steps.meta.outputs.labels }}
+  version:
+    description: Primary image version tag
+    value: ${{ steps.meta.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Docker metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ inputs.image-name }}
+        tags: |
+          type=sha
+          type=ref,event=branch
+          type=ref,event=tag
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}

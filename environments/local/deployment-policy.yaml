@@ -1,0 +1,17 @@
+environment: local
+
+promotion:
+  automatic: true
+  source_branch: main
+
+required_checks:
+  - ci
+  - security
+
+deployment:
+  target: local-docker-compose
+  strategy: recreate
+  rollback_enabled: false
+
+approval:
+  required: false
