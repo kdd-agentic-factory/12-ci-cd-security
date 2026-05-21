@@ -1,0 +1,60 @@
+{
+  "title": "CI/CD Metrics",
+  "description": "CI/CD pipeline health and performance metrics",
+  "panels": [
+    {
+      "id": 1,
+      "title": "CI Success Rate",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(ci_runs_total{status='success'}) / sum(ci_runs_total) * 100",
+          "legendFormat": "CI Success Rate %"
+        }
+      ],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {"color": "red", "value": 0},
+          {"color": "yellow", "value": 80},
+          {"color": "green", "value": 95}
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "Mean Time to Validate (minutes)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(ci_duration_seconds) / 60",
+          "legendFormat": "Avg CI Duration"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Security Findings",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(security_findings_total) by (severity)",
+          "legendFormat": "{{severity}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "SBOM Generation Rate",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(releases_with_sbom_total) / sum(releases_total) * 100",
+          "legendFormat": "SBOM Rate %"
+        }
+      ]
+    }
+  ],
+  "refresh": "5m",
+  "time": {"from": "now-7d", "to": "now"}
+}

@@ -1,0 +1,52 @@
+{
+  "title": "Deployment Frequency",
+  "description": "DORA metrics: deployment frequency and lead time",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Daily Deployments",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(increase(deployments_total[1d])) by (service)",
+          "legendFormat": "{{service}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Lead Time for Changes (hours)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(deployment_lead_time_seconds) / 3600",
+          "legendFormat": "Lead Time"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Mean Time to Recovery (hours)",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "avg(incident_recovery_time_seconds) / 3600",
+          "legendFormat": "MTTR"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Change Failure Rate",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(deployments_total{status='failed'}) / sum(deployments_total) * 100",
+          "legendFormat": "Change Failure Rate %"
+        }
+      ]
+    }
+  ],
+  "refresh": "1h",
+  "time": {"from": "now-30d", "to": "now"}
+}
