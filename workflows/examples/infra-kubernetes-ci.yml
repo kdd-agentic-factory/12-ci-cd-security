@@ -1,4 +1,4 @@
-name: Infra Kubernetes CI
+name: CI
 
 on:
   pull_request:
@@ -7,15 +7,8 @@ on:
       - main
 
 jobs:
+  k8s-validate:
+    uses: kdd-agentic-factory/12-ci-cd-security/.github/workflows/reusable-kubernetes-validate.yml@main
+
   security:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main
-
-  kubernetes:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-kubernetes-validate.yml@main
-    with:
-      overlay-path: overlays/local
-
-  compose:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-compose-validate.yml@main
-    with:
-      compose-file: docker-compose.yml
+    uses: kdd-agentic-factory/12-ci-cd-security/.github/workflows/reusable-security-scan.yml@main

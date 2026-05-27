@@ -1,4 +1,4 @@
-name: MCP Gateway CI
+name: CI
 
 on:
   pull_request:
@@ -8,16 +8,18 @@ on:
 
 jobs:
   python-ci:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-python-ci.yml@main
+    uses: kdd-agentic-factory/12-ci-cd-security/.github/workflows/reusable-python-ci.yml@main
     with:
-      python-version: "3.11"
-      run-mypy: false
+      python-version: "3.12"
 
   security:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-security-scan.yml@main
+    uses: kdd-agentic-factory/12-ci-cd-security/.github/workflows/reusable-security-scan.yml@main
 
-  docker-build:
-    uses: kdd-agentic-race-engineering/12-ci-cd-release-engineering/.github/workflows/reusable-docker-build.yml@main
+  docker:
+    needs: python-ci
+    uses: kdd-agentic-factory/12-ci-cd-security/.github/workflows/reusable-docker-build.yml@main
     with:
       image-name: mcp-gateway
-      push: false
+      push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    secrets:
+      registry-token: ${{ secrets.GITHUB_TOKEN }}
