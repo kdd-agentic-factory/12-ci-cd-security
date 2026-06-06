@@ -77,7 +77,7 @@ jobs:
 
       - name: Trivy image scan
         if: always()
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/kdd-agentic-factory/${{ inputs.image-name }}:${{ steps.meta.outputs.version }}
           scan-type: image
