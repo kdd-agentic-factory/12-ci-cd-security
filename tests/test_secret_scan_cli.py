@@ -14,3 +14,14 @@ def test_secret_scan_is_pinned_redacted_full_history_without_credentials():
     assert 'continue-on-error' not in str(steps)
     assert 'GITHUB_TOKEN' not in str(steps)
     assert set(data['jobs']) == {'secret-scan', 'dependency-scan', 'container-scan'}
+
+
+def test_staging_secret_condition_uses_supported_environment_context():
+    data = yaml.safe_load(Path('.github/workflows/reusable-deploy-staging.yml').read_text())
+    job = data['jobs']['deploy-staging']
+    step = next(s for s in job['steps'] if s['name'] == 'Configure kubeconfig')
+    assert 'secrets.' not in step['if']
+    assert job['env']['STAGING_KUBECONFIG'] == "${{ secrets.kubeconfig }}"
+    assert step['if'] == "${{ env.STAGING_KUBECONFIG != '' }}"
+    assert '"$STAGING_KUBECONFIG"' in step['run']
+    assert "${{ secrets." not in step['run']
